@@ -90,6 +90,13 @@ export async function POST(request: Request) {
     loanRate,
   })
 
+  // Debug: the prompt is sent in the "system" role (see messages below).
+  console.log("[recommend] system prompt length:", systemPrompt.length)
+  console.log(
+    "[recommend] system prompt (first 200 chars):",
+    systemPrompt.slice(0, 200)
+  )
+
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 60_000)
 
@@ -104,14 +111,10 @@ export async function POST(request: Request) {
         model: MODEL,
         messages: [
           { role: "system", content: systemPrompt },
-          {
-            role: "user",
-            content:
-              "Build my personalized financial action plan now. Respond with the JSON object only.",
-          },
+          { role: "user", content: "Generate my financial plan" },
         ],
-        temperature: 0.4,
-        max_tokens: 2048,
+        temperature: 0.1,
+        max_tokens: 3000,
         response_format: { type: "json_object" },
       }),
       signal: controller.signal,
@@ -128,6 +131,7 @@ export async function POST(request: Request) {
 
     const data = await res.json()
     const content: string | undefined = data?.choices?.[0]?.message?.content
+    console.log("[recommend] raw Groq response:", content)
     if (!content) {
       console.error("Groq returned no content:", JSON.stringify(data))
       return NextResponse.json(

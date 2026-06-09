@@ -65,7 +65,7 @@ export function InputForm({
             Welthly
           </h1>
           <p className="mt-2 text-sm" style={{ color: CREAM, opacity: 0.7 }}>
-            Build wealth like the wealthy do
+            Build wealth like the wealthy
           </p>
         </div>
 
