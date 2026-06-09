@@ -35,8 +35,10 @@ const selectClass =
 
 export function InputForm({
   onSubmit,
+  error,
 }: {
   onSubmit: (data: PlanInput) => void
+  error?: string | null
 }) {
   const [salary, setSalary] = useState(SALARY_OPTIONS[0])
   const [stateValue, setStateValue] = useState(US_STATES[0])
@@ -157,6 +159,15 @@ export function InputForm({
               ))}
             </select>
           </Field>
+
+          {error ? (
+            <p
+              role="alert"
+              className="rounded-md border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200"
+            >
+              {error}
+            </p>
+          ) : null}
 
           <button
             type="submit"

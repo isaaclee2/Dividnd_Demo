@@ -1,6 +1,6 @@
 "use client"
 
-import { ACTION_CARDS, type ActionCard } from "@/lib/plan-data"
+import { type ActionCard } from "@/lib/plan-data"
 
 const NAVY = "#2C3E6B"
 const CREAM = "#FAF7F2"
@@ -62,7 +62,13 @@ function Card({ card }: { card: ActionCard }) {
   )
 }
 
-export function ActionPlan({ onRestart }: { onRestart: () => void }) {
+export function ActionPlan({
+  cards,
+  onRestart,
+}: {
+  cards: ActionCard[]
+  onRestart: () => void
+}) {
   return (
     <main className="min-h-screen px-6 py-12" style={{ backgroundColor: CREAM }}>
       <div className="mx-auto max-w-5xl">
@@ -81,7 +87,7 @@ export function ActionPlan({ onRestart }: { onRestart: () => void }) {
         </header>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {ACTION_CARDS.map((card) => (
+          {cards.map((card) => (
             <Card key={card.priority} card={card} />
           ))}
         </div>
