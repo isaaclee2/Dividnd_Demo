@@ -17,6 +17,13 @@ export type RecommendInput = {
   hasLoans: boolean
   match: string
   loanRate: string
+  // Optional richer profile signals (used to tailor tone + priorities).
+  employment?: string
+  investments?: string
+  debt?: string
+  graduatingSoon?: string
+  jobOffer?: string
+  parentsComfortable?: string
 }
 
 export function buildSystemPrompt({
@@ -25,6 +32,12 @@ export function buildSystemPrompt({
   hasLoans,
   match,
   loanRate,
+  employment,
+  investments,
+  debt,
+  graduatingSoon,
+  jobOffer,
+  parentsComfortable,
 }: RecommendInput): string {
   // Parse "95000" / "200000+" etc. into a number so the >95k rule is deterministic.
   const salaryNum = parseInt(String(salary).replace(/[^0-9]/g, ""), 10) || 0
@@ -45,6 +58,18 @@ CLIENT PROFILE
 - Has student loans: ${hasLoans ? "Yes" : "No"}
 - Employer 401(k) match: ${match}
 - Student loan interest rate: ${loanRate}
+- Employment status: ${employment || "Not provided"}
+- Existing investments: ${investments || "Not provided"}
+- Debt types: ${debt || "Not provided"}
+- Graduating soon: ${graduatingSoon || "Not provided"}
+- Job offer / internship lined up: ${jobOffer || "Not provided"}
+- Parents financially comfortable: ${parentsComfortable || "Not provided"}
+
+PERSONALIZATION CONTEXT — use these to tailor TONE and PRIORITIES (they never override the MOST IMPORTANT RULES above):
+- Parents financially comfortable: if "No", "Somewhat", or not provided, assume little financial knowledge at home — explain every term in plain language and avoid jargon. If "Yes", you may be more advanced and concise.
+- Existing investments: if "None", include opening a first brokerage / Roth IRA and explain the basics. If "Yes, a real portfolio", skip beginner account-opening steps and focus on optimization, tax efficiency, and gaps.
+- Employment / graduating / job offer: for students, "First job lined up", or those graduating soon, prioritize foundational steps (starter emergency fund, first Roth IRA, avoiding lifestyle creep) and frame advice around their upcoming income rather than assuming current cash flow.
+- Debt types: if it includes "Credit card", the single highest priority must be paying off high-interest credit card debt before investing beyond any employer match.
 
 The following RULES are mandatory and override any default behavior.
 

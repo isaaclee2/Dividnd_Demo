@@ -65,7 +65,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 })
   }
 
-  const { salary, state, hasLoans, match, loanRate } = body
+  const {
+    salary,
+    state,
+    hasLoans,
+    match,
+    loanRate,
+    employment,
+    investments,
+    debt,
+    graduatingSoon,
+    jobOffer,
+    parentsComfortable,
+  } = body
   if (!salary || !state || !match || !loanRate) {
     return NextResponse.json(
       { error: "Missing required fields." },
@@ -88,6 +100,12 @@ export async function POST(request: Request) {
     hasLoans: Boolean(hasLoans),
     match,
     loanRate,
+    employment,
+    investments,
+    debt,
+    graduatingSoon,
+    jobOffer,
+    parentsComfortable,
   })
 
   // Debug: the prompt is sent in the "system" role (see messages below).

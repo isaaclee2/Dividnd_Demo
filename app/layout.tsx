@@ -1,17 +1,17 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
-  title: 'Welthly — Build wealth like the wealthy do',
-  description: 'Get a personalized action plan to build wealth.',
+  title: 'Welthly — Build wealth like the wealthy',
+  description: 'A personalized wealth plan built by JPMorgan-trained advisors.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} style={{ backgroundColor: '#2C3E6B' }}>
+    <html lang="en" className={inter.variable} style={{ backgroundColor: '#FAF7F2' }}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
