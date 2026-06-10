@@ -187,7 +187,7 @@ export function Onboarding({
           Let&apos;s build your wealth plan
         </h1>
         <p className="mt-3 text-base" style={{ color: navy }}>
-          A few quick questions. A plan built by JPMorgan-trained advisors.
+          A few quick questions.
         </p>
       </div>
 

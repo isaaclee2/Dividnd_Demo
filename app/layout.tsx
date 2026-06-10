@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Welthly — Build wealth like the wealthy',
-  description: 'A personalized wealth plan built by JPMorgan-trained advisors.',
+  description: 'A personalized wealth plan',
   generator: 'v0.app',
   icons: {
     icon: [
