@@ -1,6 +1,6 @@
 "use client"
 
-import { COLORS } from "@/lib/welthly"
+import { COLORS } from "@/lib/dividnd"
 
 const { cream, navy, gold } = COLORS
 

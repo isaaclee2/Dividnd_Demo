@@ -2,92 +2,41 @@
 
 import { useEffect, useState } from "react"
 import { Onboarding } from "@/components/onboarding"
-import { Analyzing } from "@/components/analyzing"
+import { ConnectBank } from "@/components/connect-bank"
 import { Dashboard } from "@/components/dashboard"
-import type { ActionCard } from "@/lib/plan-data"
 import {
   COLORS,
-  loadAnswers,
-  loadPlan,
-  savePlan,
   saveAnswers,
   isComplete,
   setComplete,
-  resetWelthly,
-  toApiInput,
+  resetDividnd,
   type OnboardingAnswers,
-} from "@/lib/welthly"
+} from "@/lib/dividnd"
 
-type Phase = "init" | "onboarding" | "analyzing" | "dashboard"
+type Phase = "init" | "onboarding" | "connect" | "dashboard"
 
 export default function Page() {
   const [phase, setPhase] = useState<Phase>("init")
-  const [cards, setCards] = useState<ActionCard[]>([])
-  const [error, setError] = useState<string | null>(null)
 
   // Decide the starting screen from localStorage (client only, avoids hydration flash).
   useEffect(() => {
-    const plan = loadPlan()
-    if (plan && plan.length > 0) {
-      setCards(plan)
-      setPhase("dashboard")
-    } else if (isComplete()) {
-      setPhase("dashboard")
-    } else {
-      setPhase("onboarding")
-    }
+    setPhase(isComplete() ? "dashboard" : "onboarding")
   }, [])
 
-  async function runRecommend(input: ReturnType<typeof toApiInput>) {
-    setPhase("analyzing")
-    setError(null)
-    try {
-      const res = await fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      })
-      const json = await res.json().catch(() => null)
-      if (!res.ok || !json?.cards) {
-        throw new Error(json?.error || "We couldn't build your plan. Please try again.")
-      }
-      const plan = json.cards as ActionCard[]
-      savePlan(plan)
-      setCards(plan)
-      setPhase("dashboard")
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "We couldn't build your plan. Please try again."
-      )
-      setCards([])
-      setPhase("dashboard")
-    }
-  }
-
+  // Onboarding done → save answers, go to the bank-connect screen (no LLM call).
   function handleComplete(answers: OnboardingAnswers) {
     saveAnswers(answers)
+    setPhase("connect")
+  }
+
+  // "Connect with Chase" done → enter the app (Home tab).
+  function handleConnected() {
     setComplete(true)
-    runRecommend(toApiInput(answers))
-  }
-
-  function handleStartPlan() {
-    setError(null)
-    setPhase("onboarding")
-  }
-
-  function handleRetry() {
-    const answers = loadAnswers()
-    if (answers) {
-      runRecommend(toApiInput(answers))
-    } else {
-      setPhase("onboarding")
-    }
+    setPhase("dashboard")
   }
 
   function handleReset() {
-    resetWelthly()
-    setCards([])
-    setError(null)
+    resetDividnd()
     setPhase("onboarding")
   }
 
@@ -99,17 +48,9 @@ export default function Page() {
     return <Onboarding onComplete={handleComplete} />
   }
 
-  if (phase === "analyzing") {
-    return <Analyzing />
+  if (phase === "connect") {
+    return <ConnectBank onConnected={handleConnected} />
   }
 
-  return (
-    <Dashboard
-      cards={cards}
-      error={error}
-      onStartPlan={handleStartPlan}
-      onRetry={handleRetry}
-      onReset={handleReset}
-    />
-  )
+  return <Dashboard onReset={handleReset} />
 }

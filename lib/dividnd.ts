@@ -1,16 +1,23 @@
 import type { ActionCard } from "./plan-data"
 
 // ── Brand palette (the only colors allowed) ─────────────────────────────────
+// Black, white & navy blue (light only). Each token resolves to a CSS variable
+// defined in globals.css. Token names are kept so existing usages re-theme:
+//   cream → --c-cream (page background + text sitting on the accent fill)
+//   white → --c-white (cards, inputs, panels, sidebar surfaces)
+//   ink   → --c-ink   (primary text)
+//   navy  → --c-navy  (accent / brand — navy blue)
+//   gold  → --c-navy  (accents — gold dropped, mapped to the accent)
 export const COLORS = {
-  cream: "#FAF7F2",
-  navy: "#2C3E6B",
-  gold: "#C9A84C",
-  ink: "#111111",
-  white: "#FFFFFF",
+  cream: "var(--c-cream)",
+  navy: "var(--c-navy)",
+  gold: "var(--c-navy)",
+  ink: "var(--c-ink)",
+  white: "var(--c-white)",
 } as const
 
 // ── Demo user + wealth score ────────────────────────────────────────────────
-export const DEMO_USER = { name: "Aditya" } as const
+export const DEMO_USER = { name: "Jordan" } as const
 
 // Base 20 + (match / Roth IRA / emergency fund / no high-interest debt) at 20 each.
 // Hardcoded to 40/100 for the demo user.
@@ -53,6 +60,7 @@ export type OnboardingAnswers = {
   graduatingSoon: string
   jobOffer: string
   parentsComfortable: string
+  goal: string // free-text life goal from the open text box
 }
 
 // ── Map answers to the API request body (matches the existing route contract) ─
@@ -91,9 +99,9 @@ export function pointsForCard(card: ActionCard): number {
 }
 
 // ── localStorage persistence (guarded for SSR) ───────────────────────────────
-const ANSWERS_KEY = "welthly:onboarding"
-const PLAN_KEY = "welthly:plan"
-const COMPLETE_KEY = "welthly:complete"
+const ANSWERS_KEY = "dividnd:onboarding"
+const PLAN_KEY = "dividnd:plan"
+const COMPLETE_KEY = "dividnd:complete"
 
 function read<T>(key: string): T | null {
   if (typeof window === "undefined") return null
@@ -138,9 +146,11 @@ export function setComplete(value: boolean) {
   write(COMPLETE_KEY, value)
 }
 
-export function resetWelthly() {
+export function resetDividnd() {
   if (typeof window === "undefined") return
-  ;[ANSWERS_KEY, PLAN_KEY, COMPLETE_KEY].forEach((k) =>
+  // "dividnd:events" is owned by lib/demo-state.ts; cleared here too so a reset
+  // wipes the whole demo (avoids an import cycle by using the literal key).
+  ;[ANSWERS_KEY, PLAN_KEY, COMPLETE_KEY, "dividnd:events"].forEach((k) =>
     window.localStorage.removeItem(k)
   )
 }

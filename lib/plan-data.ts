@@ -91,6 +91,58 @@ export type ActionCard = {
   url: string
 }
 
+// ── Scripted demo cards for "Jordan" (hardcoded, no LLM) ──────────────────────
+// `title` = the headline, `why` = the supporting context line. The other fields
+// are kept for type-compatibility but are not rendered on the demo dashboard.
+export const JORDAN_CARDS: ActionCard[] = [
+  {
+    priority: 1,
+    title: "Open a Roth IRA before May graduation — here's why this window closes forever",
+    why: "The lowest income year of Jordan's life. This window never comes back.",
+    impact: "",
+    steps: [],
+    platform: "",
+    url: "#",
+  },
+  {
+    priority: 2,
+    title:
+      "We noticed $4,000 sitting in your Chase checking earning 0.01%. Move it to a high yield savings account and earn $180 more this year — automatically.",
+    why: "Dividnd saw it. Jordan didn't have to tell us.",
+    impact: "",
+    steps: [],
+    platform: "",
+    url: "#",
+  },
+  {
+    priority: 3,
+    title: "Set up your 401k on day one — your employer will match $2,850 for free",
+    why: "Free money Jordan is one day away from leaving on the table.",
+    impact: "",
+    steps: [],
+    platform: "",
+    url: "#",
+  },
+  {
+    priority: 4,
+    title: "Austin saves you $6,200/year vs the same offer in California — here's the breakdown",
+    why: "Something Jordan's friends in California don't know yet.",
+    impact: "",
+    steps: [],
+    platform: "",
+    url: "#",
+  },
+  {
+    priority: 5,
+    title: "Your student loans at 5.5% — here's the exact math on pay off vs invest",
+    why: "Not a generic answer. Jordan's number, Jordan's rate, Jordan's decision.",
+    impact: "",
+    steps: [],
+    platform: "",
+    url: "#",
+  },
+]
+
 export const ACTION_CARDS: ActionCard[] = [
   {
     priority: 1,

@@ -10,7 +10,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Welthly — Build wealth like the wealthy',
+  title: 'Dividnd — Build wealth like the wealthy',
   description: 'A personalized wealth plan',
   generator: 'v0.app',
   icons: {
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={inter.variable} style={{ backgroundColor: '#FAF7F2' }}>
+    <html lang="en" className={inter.variable} style={{ backgroundColor: 'var(--c-cream)' }}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

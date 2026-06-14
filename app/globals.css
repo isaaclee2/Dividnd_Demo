@@ -4,6 +4,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Brand palette — black, white & navy blue (light only) ─────────────────── */
+:root {
+  --c-cream: #FFFFFF; /* page background + text sitting on the accent fill */
+  --c-white: #FFFFFF; /* surfaces: cards, inputs, sidebar */
+  --c-ink: #111111;   /* primary text */
+  --c-navy: #2C3E6B;  /* accent / brand (navy blue) */
+  --c-muted-70: rgba(17, 17, 17, 0.7);
+  --c-muted-50: rgba(17, 17, 17, 0.5);
+  --c-muted-40: rgba(17, 17, 17, 0.4);
+  --c-tint: rgba(44, 62, 107, 0.1); /* faint accent tint (tracks, hovers) */
+  --c-hover: #F5F5F5;
+}
+
 @theme inline {
   --font-heading: Georgia, 'Times New Roman', Times, serif;
   --font-sans: var(--font-inter), Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -123,11 +136,11 @@
   }
   html {
     @apply font-sans;
-    background-color: #faf7f2;
+    background-color: var(--c-cream);
   }
   body {
-    background-color: #faf7f2;
-    color: #111111;
+    background-color: var(--c-cream);
+    color: var(--c-ink);
   }
   h1,
   h2,

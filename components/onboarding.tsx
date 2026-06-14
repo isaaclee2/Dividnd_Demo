@@ -13,7 +13,7 @@ import {
   JOB_OFFER_OPTIONS,
   PARENTS_OPTIONS,
   type OnboardingAnswers,
-} from "@/lib/welthly"
+} from "@/lib/dividnd"
 
 const { navy, gold, cream, ink, white } = COLORS
 
@@ -29,6 +29,7 @@ const STEP_ORDER = [
   "grad",
   "jobOffer",
   "parents",
+  "goal",
 ] as const
 type StepKey = (typeof STEP_ORDER)[number]
 
@@ -82,17 +83,20 @@ export function Onboarding({
 }) {
   const [stepIndex, setStepIndex] = useState(0)
 
-  const [employment, setEmployment] = useState("")
-  const [salaryValue, setSalaryValue] = useState("")
-  const [stateQuery, setStateQuery] = useState("")
+  // Pre-filled as "Jordan" for the scripted demo — presenter just clicks Next.
+  const [employment, setEmployment] = useState("Student")
+  const [salaryValue, setSalaryValue] = useState("95000")
+  const [stateQuery, setStateQuery] = useState("Texas")
   const [stateOpen, setStateOpen] = useState(false)
-  const [investments, setInvestments] = useState("")
-  const [match, setMatch] = useState("")
-  const [debt, setDebt] = useState("")
-  const [loanRate, setLoanRate] = useState("")
-  const [graduatingSoon, setGraduatingSoon] = useState("")
-  const [jobOffer, setJobOffer] = useState("")
-  const [parentsComfortable, setParentsComfortable] = useState("")
+  const [investments, setInvestments] = useState("None")
+  const [match, setMatch] = useState("3%")
+  const [debt, setDebt] = useState("Student loans")
+  const [loanRate, setLoanRate] = useState("4–6%")
+  const [graduatingSoon, setGraduatingSoon] = useState("Yes, soon")
+  const [jobOffer, setJobOffer] = useState("Yes, full-time offer")
+  const [parentsComfortable, setParentsComfortable] = useState("Somewhat")
+  // The open text box is left empty so Jordan types the goal live on stage.
+  const [goal, setGoal] = useState("")
 
   const hasStudentLoans = debt === "Student loans" || debt === "Both"
 
@@ -126,6 +130,7 @@ export function Onboarding({
     grad: graduatingSoon !== "",
     jobOffer: jobOffer !== "",
     parents: parentsComfortable !== "",
+    goal: true, // optional — never blocks advancing
   }
 
   function handleNext() {
@@ -147,6 +152,7 @@ export function Onboarding({
       graduatingSoon,
       jobOffer,
       parentsComfortable,
+      goal,
     })
   }
 
@@ -168,7 +174,7 @@ export function Onboarding({
         </div>
         <div
           className="h-1.5 w-full"
-          style={{ backgroundColor: "rgba(44,62,107,0.15)", borderRadius: 4 }}
+          style={{ backgroundColor: "var(--c-tint)", borderRadius: 4 }}
         >
           <div
             className="h-full transition-all duration-300"
@@ -256,7 +262,7 @@ export function Onboarding({
                           setStateQuery(s)
                           setStateOpen(false)
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm hover:bg-[#FAF7F2]"
+                        className="block w-full px-4 py-2 text-left text-sm hover:[background-color:var(--c-hover)]"
                         style={{ color: ink }}
                       >
                         {s}
@@ -324,6 +330,23 @@ export function Onboarding({
               options={PARENTS_OPTIONS}
               value={parentsComfortable}
               onChange={setParentsComfortable}
+            />
+          </div>
+        )}
+
+        {current === "goal" && (
+          <div className="flex flex-col gap-5">
+            <QuestionLabel>What are you working toward?</QuestionLabel>
+            <p className="-mt-2 text-sm" style={{ color: navy, opacity: 0.7 }}>
+              Tell Dividnd your goals in your own words.
+            </p>
+            <textarea
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              rows={4}
+              placeholder="e.g. I want to buy a house in the next 4 years and eventually help my parents retire"
+              className="w-full resize-none border px-4 py-3 text-base outline-none"
+              style={{ borderRadius: 4, borderColor: navy, backgroundColor: white, color: ink }}
             />
           </div>
         )}
