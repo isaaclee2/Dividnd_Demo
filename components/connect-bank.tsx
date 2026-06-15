@@ -41,10 +41,10 @@ export function ConnectBank({ onConnected }: { onConnected: () => void }) {
           type="button"
           onClick={handleConnect}
           disabled={connecting}
-          className="mt-10 w-full border px-8 py-4 text-base font-semibold transition-opacity disabled:opacity-70"
+          className="btn-hover mt-10 w-full border px-8 py-4 text-base font-semibold disabled:opacity-70"
           style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
         >
-          {connecting ? "Connecting to Chase…" : "Connect with Chase"}
+          {connecting ? "Connecting…" : "Connect bank account with Plaid"}
         </button>
 
         {connecting && (
@@ -53,7 +53,7 @@ export function ConnectBank({ onConnected }: { onConnected: () => void }) {
               className="inline-block h-2 w-2 animate-pulse rounded-full"
               style={{ backgroundColor: gold }}
             />
-            Securely linking your Chase account…
+            Securely linking your bank account…
           </div>
         )}
       </div>

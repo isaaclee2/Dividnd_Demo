@@ -10,6 +10,11 @@
   --c-white: #FFFFFF; /* surfaces: cards, inputs, sidebar */
   --c-ink: #111111;   /* primary text */
   --c-navy: #2C3E6B;  /* accent / brand (navy blue) */
+  --c-gold: #C9A84C;  /* gold accent — dollar impact figures, key stats only */
+  --c-sidebar: #FAFAFA; /* sidebar / secondary panel surface */
+  --c-border: #E5E7EB;  /* hairline card + panel border */
+  --c-muted: #6B7280;   /* secondary text + labels */
+  --c-red: #DC2626;     /* negative numbers only */
   --c-muted-70: rgba(17, 17, 17, 0.7);
   --c-muted-50: rgba(17, 17, 17, 0.5);
   --c-muted-40: rgba(17, 17, 17, 0.4);
@@ -148,4 +153,32 @@
   .font-heading {
     font-family: var(--font-heading);
   }
+}
+
+/* ── Shared motion + surface helpers ───────────────────────────────────────── */
+@keyframes dividnd-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Subtle page-load fade — opacity 0 → 1 over 0.3s (the only entrance motion). */
+.fade-in {
+  animation: dividnd-fade-in 0.3s ease-out both;
+}
+
+/* Very subtle box-shadow lift on hover for cards. */
+.card-hover {
+  transition: box-shadow 0.15s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Buttons darken slightly on hover with a pointer cursor. */
+.btn-hover {
+  cursor: pointer;
+  transition: filter 0.15s ease, opacity 0.15s ease, background-color 0.15s ease;
+}
+.btn-hover:hover {
+  filter: brightness(0.9);
 }

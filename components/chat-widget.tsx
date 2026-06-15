@@ -5,7 +5,7 @@ import { MessageCircle, X } from "lucide-react"
 import { COLORS } from "@/lib/dividnd"
 import { UpdateChat } from "@/components/update-chat"
 
-const { navy, cream, white } = COLORS
+const { navy, cream, white, border } = COLORS
 
 export function ChatWidget({
   applied,
@@ -21,7 +21,7 @@ export function ChatWidget({
       {open && (
         <div
           className="flex w-[22rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden border shadow-xl"
-          style={{ borderRadius: 12, borderColor: navy, backgroundColor: white }}
+          style={{ borderRadius: 12, borderColor: border, backgroundColor: white }}
         >
           {/* Header */}
           <div
@@ -35,6 +35,7 @@ export function ChatWidget({
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close chat"
+              className="btn-hover"
               style={{ color: cream }}
             >
               <X size={16} />

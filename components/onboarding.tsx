@@ -15,7 +15,7 @@ import {
   type OnboardingAnswers,
 } from "@/lib/dividnd"
 
-const { navy, gold, cream, ink, white } = COLORS
+const { navy, gold, cream, ink, white, border } = COLORS
 
 // Fixed order; "loanRate" is only shown when the user has student loans.
 const STEP_ORDER = [
@@ -52,10 +52,10 @@ function Segmented({
             key={opt}
             type="button"
             onClick={() => onChange(opt)}
-            className="border px-5 py-3 text-sm font-medium transition-colors"
+            className="btn-hover border px-5 py-3 text-sm font-medium transition-colors"
             style={{
               borderRadius: 4,
-              borderColor: navy,
+              borderColor: active ? navy : border,
               backgroundColor: active ? navy : white,
               color: active ? cream : ink,
             }}
@@ -226,7 +226,7 @@ export function Onboarding({
                 onChange={(e) => setSalaryValue(e.target.value.replace(/[^0-9]/g, ""))}
                 placeholder="65,000"
                 className="w-full border py-3 pl-8 pr-4 text-base outline-none"
-                style={{ borderRadius: 4, borderColor: navy, backgroundColor: white, color: ink }}
+                style={{ borderRadius: 4, borderColor: border, backgroundColor: white, color: ink }}
               />
             </div>
           </div>
@@ -247,12 +247,12 @@ export function Onboarding({
                 placeholder="Start typing a state…"
                 autoComplete="off"
                 className="w-full border px-4 py-3 text-base outline-none"
-                style={{ borderRadius: 4, borderColor: navy, backgroundColor: white, color: ink }}
+                style={{ borderRadius: 4, borderColor: border, backgroundColor: white, color: ink }}
               />
               {stateOpen && stateSuggestions.length > 0 && (
                 <ul
                   className="absolute z-10 mt-1 w-full overflow-hidden border bg-white"
-                  style={{ borderRadius: 4, borderColor: navy }}
+                  style={{ borderRadius: 4, borderColor: border }}
                 >
                   {stateSuggestions.map((s) => (
                     <li key={s}>
@@ -346,7 +346,7 @@ export function Onboarding({
               rows={4}
               placeholder="e.g. I want to buy a house in the next 4 years and eventually help my parents retire"
               className="w-full resize-none border px-4 py-3 text-base outline-none"
-              style={{ borderRadius: 4, borderColor: navy, backgroundColor: white, color: ink }}
+              style={{ borderRadius: 4, borderColor: border, backgroundColor: white, color: ink }}
             />
           </div>
         )}
@@ -367,7 +367,7 @@ export function Onboarding({
           type="button"
           onClick={handleNext}
           disabled={!canAdvance[current]}
-          className="border px-8 py-3 text-sm font-semibold transition-opacity disabled:opacity-40"
+          className="btn-hover border px-8 py-3 text-sm font-semibold disabled:opacity-40"
           style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
         >
           {stepIndex < total - 1 ? "Next" : "See My Plan"}

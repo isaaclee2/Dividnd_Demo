@@ -11,9 +11,13 @@ import type { ActionCard } from "./plan-data"
 export const COLORS = {
   cream: "var(--c-cream)",
   navy: "var(--c-navy)",
-  gold: "var(--c-navy)",
+  gold: "var(--c-gold)",
   ink: "var(--c-ink)",
   white: "var(--c-white)",
+  sidebar: "var(--c-sidebar)",
+  border: "var(--c-border)",
+  muted: "var(--c-muted)",
+  red: "var(--c-red)",
 } as const
 
 // ── Demo user + wealth score ────────────────────────────────────────────────

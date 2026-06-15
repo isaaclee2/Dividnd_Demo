@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { COLORS } from "@/lib/dividnd"
 import { EVENTS, getEvent, routeMessage } from "@/lib/demo-state"
 
-const { navy, cream, ink, white } = COLORS
+const { navy, cream, ink, white, border } = COLORS
 
 type Msg = { role: "user" | "bot"; text: string }
 
@@ -57,7 +57,7 @@ export function UpdateChat({
   return (
     <div
       className={bare ? "flex flex-col" : "mt-4 flex flex-col border"}
-      style={bare ? { backgroundColor: white } : { borderRadius: 4, borderColor: navy, backgroundColor: white }}
+      style={bare ? { backgroundColor: white } : { borderRadius: 4, borderColor: border, backgroundColor: white }}
     >
       {/* Conversation */}
       <div ref={scrollRef} className="flex max-h-80 flex-col gap-3 overflow-y-auto p-5">
@@ -70,7 +70,7 @@ export function UpdateChat({
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
               backgroundColor: m.role === "user" ? navy : cream,
               color: m.role === "user" ? cream : ink,
-              border: m.role === "bot" ? `1px solid ${navy}` : "none",
+              border: m.role === "bot" ? `1px solid ${border}` : "none",
             }}
           >
             {m.text}
@@ -86,8 +86,8 @@ export function UpdateChat({
               key={e.id}
               type="button"
               onClick={() => respond(e.chip!, e.id)}
-              className="border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-              style={{ borderRadius: 999, backgroundColor: cream, borderColor: navy, color: navy }}
+              className="btn-hover border px-3 py-1.5 text-xs font-medium"
+              style={{ borderRadius: 999, backgroundColor: cream, borderColor: border, color: navy }}
             >
               {e.chip}
             </button>
@@ -96,7 +96,7 @@ export function UpdateChat({
       )}
 
       {/* Input */}
-      <div className="flex items-center gap-2 border-t p-3" style={{ borderColor: navy }}>
+      <div className="flex items-center gap-2 border-t p-3" style={{ borderColor: border }}>
         <input
           type="text"
           value={input}
@@ -106,12 +106,12 @@ export function UpdateChat({
           }}
           placeholder="Tell Dividnd what changed…"
           className="flex-1 border px-4 py-2.5 text-sm outline-none"
-          style={{ borderRadius: 4, borderColor: navy, backgroundColor: white, color: ink }}
+          style={{ borderRadius: 4, borderColor: border, backgroundColor: white, color: ink }}
         />
         <button
           type="button"
           onClick={handleSend}
-          className="border px-5 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90"
+          className="btn-hover border px-5 py-2.5 text-sm font-semibold"
           style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
         >
           Send
