@@ -7,13 +7,7 @@ import { UpdateChat } from "@/components/update-chat"
 
 const { navy, cream, white, border } = COLORS
 
-export function ChatWidget({
-  applied,
-  onApply,
-}: {
-  applied: string[]
-  onApply: (id: string) => void
-}) {
+export function ChatWidget() {
   const [open, setOpen] = useState(false)
 
   return (
@@ -41,7 +35,7 @@ export function ChatWidget({
               <X size={16} />
             </button>
           </div>
-          <UpdateChat applied={applied} onApply={onApply} bare />
+          <UpdateChat bare />
         </div>
       )}
 

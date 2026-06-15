@@ -370,7 +370,7 @@ export function Onboarding({
           className="btn-hover border px-8 py-3 text-sm font-semibold disabled:opacity-40"
           style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
         >
-          {stepIndex < total - 1 ? "Next" : "See My Plan"}
+          {stepIndex < total - 1 ? "Next" : "See My Wealth Plan"}
         </button>
       </div>
     </main>

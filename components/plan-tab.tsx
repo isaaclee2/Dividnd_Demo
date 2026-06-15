@@ -2,85 +2,119 @@
 
 import { useState } from "react"
 import { COLORS } from "@/lib/dividnd"
-import { GOAL, PLAN_TOTAL, situationSummary, type DerivedState, type PlanItem } from "@/lib/demo-state"
+import { GOAL } from "@/lib/demo-state"
 
 const { navy, cream, ink, white, gold, border, muted } = COLORS
 
-// ── Per-card presentation copy (additive — derived from each item's existing
-//    numbers, no underlying data values changed). Keyed by plan-item id. ───────
-type CardCopy = { dollarImpact: string; whyThis: string; badge: string }
+// Hardcoded wealth score for the demo (static — not derived).
+const SCORE = 28
+const SCORE_FULL = 94
 
-const CARD_COPY: Record<string, CardCopy> = {
-  roth: {
-    dollarImpact: "Worth $106,000 in tax-free wealth by retirement",
-    whyThis:
-      "Contributing while you're in the lowest tax bracket you'll ever be in locks in decades of tax-free compounding. At a 7% return over 40 years, today's contributions grow to roughly $106,000 you'll never pay a cent of tax on. Doing it before you graduate buys an extra year of growth you can't get back.",
-    badge: "Fidelity",
-  },
-  hysa: {
-    dollarImpact: "Worth $180 more this year — risk-free",
-    whyThis:
-      "Your $4,000 sits in Chase at 0.01% APY, earning essentially nothing. An Ally high-yield account pays 4.40% — about $180 a year on the same money, fully liquid and FDIC-insured. It's the closest thing to free money in personal finance.",
-    badge: "Ally Bank",
-  },
-  k401: {
-    dollarImpact: "Worth $2,850/yr in free money — over $250,000 by retirement",
-    whyThis:
-      "Your employer matches your contributions up to about $2,850 a year — a 100% instant return you only get if you enroll. Skip it and you're turning down a guaranteed raise. Invested at 7% across your career, that match alone compounds to more than $250,000.",
-    badge: "Your employer",
-  },
-  austin: {
-    dollarImpact: "Worth $6,200/yr — about $248,000 over a 40-year career",
-    whyThis:
-      "Texas has no state income tax; California's top brackets take a real cut of every paycheck. On your offer that's roughly $6,200 more in take-home pay each year in Austin. Banked and invested, that one geographic choice is worth nearly a quarter-million dollars.",
-    badge: "Dividnd analysis",
-  },
-  loans: {
-    dollarImpact: "Worth getting right — the wrong call costs thousands in interest",
-    whyThis:
-      "Your student loans charge 5.5%, while a diversified portfolio has historically returned about 7%. That narrow gap means the math isn't obvious — extra payments guarantee a 5.5% return, investing might beat it but isn't certain. We've run your exact numbers to show which dollar works hardest.",
-    badge: "Dividnd analysis",
-  },
-}
-
-// ── The niche bonus strategy card (hardcoded, non-completable). ──────────────
-const MEGA_CARD = {
-  title: "Check Mega Backdoor Roth Eligibility",
-  dollarImpact: "Could unlock $46,500/yr in tax-free space — worth $2M+ over 20 years",
-  description:
-    "Your employer plan may allow after-tax 401k contributions that can be converted to Roth immediately. One phone call to HR could be the most valuable 10 minutes of your financial life.",
-  whyThis:
-    "The standard 401k limit is $23,500 but the total limit including employer is $70,000. If your plan allows after-tax contributions and in-plan Roth conversions, you can contribute up to $46,500 more and convert it to Roth tax-free. Most people never know this exists.",
-  cta: "Call HR",
-  badge: "Your HR Department",
-  href: "mailto:hr@yourcompany.com?subject=Mega%20Backdoor%20Roth%20eligibility",
-}
-
-// ── A single action / strategy card ──────────────────────────────────────────
-function PlanCard({
-  priority,
-  title,
-  dollarImpact,
-  description,
-  whyThis,
-  badge,
-  ctaLabel,
-  topPriority,
-  onCta,
-  href,
-}: {
+// ── The six private-wealth strategies (hardcoded, static). ───────────────────
+type StrategyCard = {
+  id: string
   priority: number
   title: string
+  badge: string
   dollarImpact: string
   description: string
   whyThis: string
-  badge: string
   ctaLabel: string
-  topPriority: boolean
-  onCta?: () => void
-  href?: string
+  ctaHref: string
+}
+
+const CARDS: StrategyCard[] = [
+  {
+    id: "match",
+    priority: 1,
+    title: "Capture Your Full 401(k) Match",
+    badge: "Your HR Portal",
+    dollarImpact: "Worth $3,800/year — a guaranteed 100% return",
+    description:
+      "Your employer matches 4% of your salary. Contributing at least 4% captures $3,800 in free money annually. Nothing in investing gives you a guaranteed 100% return. This is first — always.",
+    whyThis:
+      "Most new grads contribute whatever the default enrollment sets — often 3% or nothing. Leaving employer match on the table is the single most common and most expensive mistake we see. On your $95,000 salary, the full match is $3,800/year. Over 30 years at 7% that uncaptured match compounds to $385,000.",
+    ctaLabel: "Enroll Now",
+    ctaHref: "https://www.dol.gov/general/topic/retirement/401kplans",
+  },
+  {
+    id: "roth",
+    priority: 2,
+    title: "Open a Roth IRA at Fidelity",
+    badge: "Fidelity",
+    dollarImpact: "Worth $106,000 in tax-free wealth by retirement",
+    description:
+      "At 22 and $95,000, you're below the income limit for direct Roth contributions. Contribute $7,000 this year. Invest in FZROX — Fidelity's zero-fee total market fund. This is the most powerful account you can open at your age.",
+    whyThis:
+      "$7,000 invested at 22 in a Roth IRA grows completely tax-free. At 8% average annual return, that single $7,000 contribution becomes $106,000 by 65. Every year you delay this costs you roughly $8,000 in future tax-free wealth. You pay taxes on the money now when your rate is low — never again when your rate is high.",
+    ctaLabel: "Open It",
+    ctaHref: "https://www.fidelity.com/retirement-ira/roth-ira",
+  },
+  {
+    id: "backdoor",
+    priority: 3,
+    title: "Check Mega Backdoor Roth Eligibility",
+    badge: "Your HR Department",
+    dollarImpact: "Could unlock $46,500/yr in additional tax-free retirement space",
+    description:
+      "Most people don't know their 401(k) has a hidden door. If your employer plan allows after-tax contributions and in-plan Roth conversions, you can contribute an additional $46,500 per year — all converting to Roth immediately. One phone call to HR.",
+    whyThis:
+      "The standard 401k employee limit is $23,500. But the total 401k limit including employer contributions is $70,000. The gap — up to $46,500 — can be filled with after-tax contributions if your plan allows it. Most plans do. Most people never ask. Over 20 years at 8%, this unlocks over $2,000,000 in additional tax-free retirement wealth. Ask HR: 'Does my plan allow after-tax contributions and in-plan Roth conversions?'",
+    ctaLabel: "Call HR",
+    ctaHref: "tel:",
+  },
+  {
+    id: "ibonds",
+    priority: 4,
+    title: "Build Your Emergency Fund in I-Bonds",
+    badge: "TreasuryDirect",
+    dollarImpact: "Earn 4.3% guaranteed — beats every savings account",
+    description:
+      "Keep 1 month of expenses in a HYSA at Marcus for liquidity. Then move the rest of your emergency fund target ($23,750) into I-Bonds — US government bonds that pay the inflation rate, guaranteed, zero risk. Your emergency fund should never lose to inflation.",
+    whyThis:
+      "Most people keep their entire emergency fund in a checking account earning 0.01%. A HYSA earns around 4.5% — better but not guaranteed. I-Bonds are issued by the US Treasury, pay the official inflation rate (currently ~4.3%), and carry zero default risk. The one catch: you cannot withdraw for the first 12 months. Keep one month in HYSA for true liquidity, move the rest to I-Bonds. On a $23,750 emergency fund the difference is roughly $950/year in additional interest — risk-free.",
+    ctaLabel: "Open Account",
+    ctaHref: "https://www.treasurydirect.gov",
+  },
+  {
+    id: "hsa",
+    priority: 5,
+    title: "Enroll in Your HSA — Invest It, Never Spend It",
+    badge: "Fidelity HSA",
+    dollarImpact: "Triple tax-free — the best account in the US tax code",
+    description:
+      "If your employer offers a High Deductible Health Plan, you qualify for an HSA. Contribute $4,300 this year. Invest it in FZROX. Pay all medical expenses out of pocket. Start saving every receipt — you can reimburse yourself tax-free decades from now with no time limit.",
+    whyThis:
+      "The HSA is the only triple tax-advantaged account in the US tax code — contributions are pre-tax, growth is tax-free, withdrawals for medical are tax-free. After 65 you can withdraw for anything, taxed like a traditional IRA — making it effectively a second 401k. The receipt harvesting strategy: save every medical receipt from today forward. In 20 years, reimburse yourself for all of them at once from your HSA — completely tax-free. $4,300/year invested at 8% for 30 years = $52,000 tax-free, plus potentially tens of thousands in reimbursements.",
+    ctaLabel: "Open HSA",
+    ctaHref: "https://www.fidelity.com/go/hsa/overview",
+  },
+  {
+    id: "loans",
+    priority: 6,
+    title: "Aggressively Pay Down Student Loans",
+    badge: "SoFi",
+    dollarImpact: "Save $4,200 in interest — paid off 3 years faster",
+    description:
+      "Your loans are at 5.5% — above the threshold where paying off beats investing the difference. After capturing your 401k match and funding your Roth IRA, put every extra dollar here. Paying $500 extra per month eliminates your $27,000 balance 3 years faster and saves $4,200 in interest. Also check if refinancing to a lower rate makes sense.",
+    whyThis:
+      "The math is simple: if your loan rate is above the risk-free return you can earn elsewhere, pay the loan. At 5.5%, your after-tax effective rate is approximately 5.5% (you've lost the student loan interest deduction at $95,000 income — it phases out at $90,000). The market earns ~7% long-term but that's not guaranteed. 5.5% guaranteed savings by paying the loan is better than the marginal additional investing after your Roth IRA is funded.",
+    ctaLabel: "Check Refinance Rate",
+    ctaHref: "https://www.sofi.com/refinance-student-loan",
+  },
+]
+
+// ── A single strategy card ───────────────────────────────────────────────────
+function PlanCard({
+  card,
+  open,
+  onToggle,
+}: {
+  card: StrategyCard
+  open: boolean
+  onToggle: () => void
 }) {
-  const [open, setOpen] = useState(false)
+  const topPriority = card.priority === 1
 
   return (
     <article
@@ -98,51 +132,37 @@ function PlanCard({
           className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-sm font-bold"
           style={{ backgroundColor: navy, color: white }}
         >
-          {priority}
+          {card.priority}
         </span>
-        <span
-          className="text-[11px] font-medium uppercase"
-          style={{ color: muted, letterSpacing: "0.08em" }}
-        >
-          {badge}
-        </span>
+        <span className="platform-badge">{card.badge}</span>
       </div>
 
       <h3 className="font-heading text-lg font-bold leading-tight" style={{ color: navy }}>
-        {title}
+        {card.title}
       </h3>
 
       {/* Dollar impact — the hero element */}
-      <p className="font-bold leading-snug" style={{ color: gold, fontSize: 20 }}>
-        {dollarImpact}
+      <p className="font-heading font-bold leading-snug" style={{ color: gold, fontSize: 20 }}>
+        {card.dollarImpact}
       </p>
 
       <p className="leading-relaxed" style={{ color: ink, fontSize: 14 }}>
-        {description}
+        {card.description}
       </p>
 
       <div className="mt-auto flex items-center gap-3 pt-2">
-        {href ? (
-          <a
-            href={href}
-            className="btn-hover flex-1 border px-5 py-2.5 text-center text-sm font-semibold"
-            style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
-          >
-            {ctaLabel}
-          </a>
-        ) : (
-          <button
-            type="button"
-            onClick={onCta}
-            className="btn-hover flex-1 border px-5 py-2.5 text-center text-sm font-semibold"
-            style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
-          >
-            {ctaLabel}
-          </button>
-        )}
+        <a
+          href={card.ctaHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-hover flex-1 border px-5 py-2.5 text-center text-sm font-semibold"
+          style={{ borderRadius: 4, backgroundColor: navy, borderColor: navy, color: cream }}
+        >
+          {card.ctaLabel}
+        </a>
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={onToggle}
           className="btn-hover flex-1 border px-5 py-2.5 text-center text-sm font-semibold"
           style={{ borderRadius: 4, backgroundColor: white, borderColor: navy, color: navy }}
         >
@@ -150,43 +170,23 @@ function PlanCard({
         </button>
       </div>
 
-      {/* Inline expandable explanation — no modal, no new page */}
-      {open && (
+      {/* Inline expandable explanation — animated max-height, no modal */}
+      <div
+        style={{
+          maxHeight: open ? 600 : 0,
+          opacity: open ? 1 : 0,
+          overflow: "hidden",
+          transition: "max-height 0.25s ease, opacity 0.25s ease",
+        }}
+      >
         <div
           className="mt-1 border-t pt-3 text-sm leading-relaxed"
           style={{ borderColor: border, color: muted }}
         >
-          {whyThis}
+          {card.whyThis}
         </div>
-      )}
+      </div>
     </article>
-  )
-}
-
-function DoneRow({ item, onUndo }: { item: PlanItem; onUndo: () => void }) {
-  return (
-    <div
-      className="flex items-center gap-3 border p-4"
-      style={{ borderRadius: 4, borderColor: border, backgroundColor: white }}
-    >
-      <span
-        className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-xs font-bold"
-        style={{ backgroundColor: navy, color: cream }}
-      >
-        ✓
-      </span>
-      <span className="flex-1 text-sm line-through" style={{ color: ink, opacity: 0.6 }}>
-        {item.title}
-      </span>
-      <button
-        type="button"
-        onClick={onUndo}
-        className="btn-hover flex-none text-xs font-medium underline underline-offset-2"
-        style={{ color: navy }}
-      >
-        Undo
-      </button>
-    </div>
   )
 }
 
@@ -205,57 +205,19 @@ function EditIcon() {
   )
 }
 
-// Render the "Where you stand" summary with key figures bolded inline, while
-// keeping the conversational sentence exactly as situationSummary() produces it.
-function StandSummary({ text }: { text: string }) {
-  const figures = /(\$[\d,]+|\d+(?:\.\d+)?%)/g
-  const parts = text.split(figures)
-  return (
-    <>
-      {parts.map((part, i) =>
-        /^(\$[\d,]+|\d+(?:\.\d+)?%)$/.test(part) ? (
-          <strong key={i} style={{ color: ink, fontWeight: 700 }}>
-            {part}
-          </strong>
-        ) : (
-          <span key={i}>{part}</span>
-        ),
-      )}
-    </>
-  )
-}
-
-export function PlanTab({
-  state,
-  onApply,
-  onUndo,
-}: {
-  state: DerivedState
-  onApply: (id: string) => void
-  onUndo: (id: string) => void
-}) {
-  const { planItems, completedCount, situation } = state
-  const todo = planItems.filter((p) => !p.done).map((p) => p.item)
-  const done = planItems.filter((p) => p.done).map((p) => p.item)
-  const pct = Math.round((completedCount / PLAN_TOTAL) * 100)
-  const milestones = [20, 40, 60, 80, 100]
-
-  // Build the display list: real action cards with the bonus Mega Backdoor card
-  // spliced in at the 3rd position so it's always visible.
-  const actionCards = todo.map((item) => ({ type: "action" as const, item }))
-  const display: ({ type: "action"; item: PlanItem } | { type: "mega" })[] = [...actionCards]
-  display.splice(Math.min(2, display.length), 0, { type: "mega" })
+export function PlanTab() {
+  // Only one "Why this?" open at a time.
+  const [openId, setOpenId] = useState<string | null>(null)
+  const pct = Math.round((SCORE / 100) * 100)
 
   return (
     <div className="mx-auto w-full max-w-5xl">
       <h1 className="font-heading text-4xl" style={{ color: ink }}>
-        Your plan
+        Your Wealth Plan
       </h1>
-      <p className="mt-2 text-base" style={{ color: muted }}>
-        It updates automatically as your situation changes.
-      </p>
+      <p className="section-label mt-2">Built for your situation — updated as your life changes</p>
 
-      {/* Where you stand — short summary derived from the live situation */}
+      {/* Your situation */}
       <section
         className="card-hover mt-6 border p-6"
         style={{
@@ -265,11 +227,13 @@ export function PlanTab({
           borderLeft: `3px solid ${navy}`,
         }}
       >
-        <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: navy }}>
-          Where you stand
-        </p>
+        <p className="section-label">Your situation</p>
         <p className="mt-2 text-base leading-relaxed" style={{ color: ink }}>
-          <StandSummary text={situationSummary(situation)} />
+          You're 22, starting a $95,000 role in Austin. You have $27,000 in student loans at 5.5%
+          and $4,000 in cash. You haven't started investing yet —{" "}
+          <span style={{ color: gold, fontWeight: 700 }}>
+            which means every month you wait costs you approximately $8,000 at retirement.
+          </span>
         </p>
       </section>
 
@@ -278,12 +242,7 @@ export function PlanTab({
         className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 border-l-4 py-1 pl-4"
         style={{ borderColor: navy }}
       >
-        <span
-          className="text-xs font-semibold uppercase"
-          style={{ color: navy, letterSpacing: "0.15em" }}
-        >
-          Goal
-        </span>
+        <span className="section-label">Goal</span>
         <span className="text-sm" style={{ color: ink }}>
           {GOAL}
         </span>
@@ -292,125 +251,53 @@ export function PlanTab({
         </span>
       </div>
 
-      {/* Progress header */}
+      {/* Wealth score */}
       <section
         className="card-hover mt-8 border p-6"
         style={{ borderRadius: 4, backgroundColor: white, borderColor: border }}
       >
-        <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: navy }}>
-          Progress
+        <p className="section-label">Wealth Score</p>
+        <p className="mt-2 font-heading font-bold" style={{ color: navy, fontSize: 48, lineHeight: 1 }}>
+          {SCORE} / 100
         </p>
-        <p className="mt-2 text-sm" style={{ color: ink, opacity: 0.8 }}>
-          {completedCount} of {PLAN_TOTAL} actions complete
+        <p className="mt-2 text-sm" style={{ color: muted }}>
+          Complete your action plan to increase your score
         </p>
         <div
-          className="relative mt-4 h-2 w-full"
+          className="mt-4 h-2 w-full"
           style={{ backgroundColor: "var(--c-tint)", borderRadius: 4 }}
         >
           <div
             className="h-full transition-all duration-500"
             style={{ width: `${pct}%`, backgroundColor: navy, borderRadius: 4 }}
           />
-          {/* Milestone markers at 20/40/60/80/100% */}
-          {milestones.map((m) => (
-            <span
-              key={m}
-              className="absolute top-1/2 h-3 w-px -translate-y-1/2"
-              style={{
-                left: `${m}%`,
-                backgroundColor: m <= pct ? white : navy,
-                opacity: m <= pct ? 0.6 : 0.35,
-                marginLeft: -0.5,
-              }}
-            />
-          ))}
         </div>
         <p className="mt-3 text-sm" style={{ color: ink }}>
-          Completing all 5 actions puts you on track for{" "}
-          <span style={{ color: navy, fontWeight: 700 }}>$1.9M by retirement</span>.
+          Following this plan fully puts you at{" "}
+          <span style={{ color: navy, fontWeight: 700 }}>{SCORE_FULL} / 100</span>.
+        </p>
+        <p className="mt-2 text-xs" style={{ color: muted }}>
+          Score reflects tax optimization, account structure, and investment strategy — not spending
+          habits.
         </p>
       </section>
 
-      {/* Action plan */}
-      <h2
-        className="mt-10 text-sm font-semibold uppercase"
-        style={{ color: navy, letterSpacing: "0.15em" }}
-      >
-        Your action plan — ranked by impact
-      </h2>
+      {/* Private wealth plan */}
+      <h2 className="section-label mt-10">Your private wealth plan</h2>
       <p className="mt-1 text-sm" style={{ color: muted }}>
-        Complete these in order. Each one builds on the last.
+        These are the moves your banker makes. Now they're yours.
       </p>
 
-      {todo.length === 0 ? (
-        <>
-          <p className="mt-4 text-sm italic" style={{ color: muted }}>
-            Every action is done — Jordan's plan is complete.
-          </p>
-          <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-            <PlanCard
-              priority={1}
-              title={MEGA_CARD.title}
-              dollarImpact={MEGA_CARD.dollarImpact}
-              description={MEGA_CARD.description}
-              whyThis={MEGA_CARD.whyThis}
-              badge={MEGA_CARD.badge}
-              ctaLabel={MEGA_CARD.cta}
-              href={MEGA_CARD.href}
-              topPriority
-            />
-          </div>
-        </>
-      ) : (
-        <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {display.map((card, i) =>
-            card.type === "mega" ? (
-              <PlanCard
-                key="mega"
-                priority={i + 1}
-                title={MEGA_CARD.title}
-                dollarImpact={MEGA_CARD.dollarImpact}
-                description={MEGA_CARD.description}
-                whyThis={MEGA_CARD.whyThis}
-                badge={MEGA_CARD.badge}
-                ctaLabel={MEGA_CARD.cta}
-                href={MEGA_CARD.href}
-                topPriority={i === 0}
-              />
-            ) : (
-              <PlanCard
-                key={card.item.id}
-                priority={i + 1}
-                title={card.item.title}
-                dollarImpact={CARD_COPY[card.item.id]?.dollarImpact ?? ""}
-                description={card.item.why}
-                whyThis={CARD_COPY[card.item.id]?.whyThis ?? ""}
-                badge={CARD_COPY[card.item.id]?.badge ?? "Dividnd"}
-                ctaLabel={card.item.cta ?? "Approve"}
-                topPriority={i === 0}
-                onCta={() => onApply(card.item.id)}
-              />
-            ),
-          )}
-        </div>
-      )}
-
-      {/* Completed */}
-      {done.length > 0 && (
-        <>
-          <h2
-            className="mt-10 text-sm font-semibold uppercase tracking-widest"
-            style={{ color: muted }}
-          >
-            Completed ({done.length})
-          </h2>
-          <div className="mt-4 flex flex-col gap-3">
-            {done.map((item) => (
-              <DoneRow key={item.id} item={item} onUndo={() => onUndo(item.id)} />
-            ))}
-          </div>
-        </>
-      )}
+      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+        {CARDS.map((card) => (
+          <PlanCard
+            key={card.id}
+            card={card}
+            open={openId === card.id}
+            onToggle={() => setOpenId((cur) => (cur === card.id ? null : card.id))}
+          />
+        ))}
+      </div>
     </div>
   )
 }

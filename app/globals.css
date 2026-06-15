@@ -148,11 +148,33 @@
     color: var(--c-ink);
   }
   h1,
-  h2,
-  h3,
   .font-heading {
     font-family: var(--font-heading);
   }
+  h1 {
+    font-weight: 700;
+  }
+}
+
+/* ── Strict typographic roles ──────────────────────────────────────────────── */
+/* Small-caps section labels — Inter, never serif (even on an <h2>). */
+.section-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--c-navy);
+}
+
+/* Platform / metadata badges — Inter. */
+.platform-badge {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-muted);
 }
 
 /* ── Shared motion + surface helpers ───────────────────────────────────────── */
@@ -181,4 +203,21 @@
 }
 .btn-hover:hover {
   filter: brightness(0.9);
+}
+
+/* Life-event trigger pill — navy outline, fills navy on hover. */
+.life-event-pill {
+  cursor: pointer;
+  border: 1px solid var(--c-navy);
+  border-radius: 999px;
+  background-color: var(--c-white);
+  color: var(--c-navy);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.life-event-pill:hover {
+  background-color: var(--c-navy);
+  color: var(--c-white);
 }

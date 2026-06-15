@@ -2,21 +2,20 @@
 
 import { useState } from "react"
 import { COLORS } from "@/lib/dividnd"
-import { loadEvents, saveEvents, deriveState } from "@/lib/demo-state"
 import { PlanTab } from "@/components/plan-tab"
-import { AccountsTab } from "@/components/accounts-tab"
+import { ProfileTab } from "@/components/profile-tab"
 import { PortfolioTab } from "@/components/portfolio-tab"
 import { ChatWidget } from "@/components/chat-widget"
 
 const { navy, cream, ink, white, sidebar, border, muted } = COLORS
 
-type Tab = "plan" | "accounts" | "portfolio"
+type Tab = "plan" | "portfolio" | "profile"
 
 const NAV_ITEMS: { key: Tab | null; label: string; soon?: boolean }[] = [
   { key: "plan", label: "My Plan" },
   { key: "portfolio", label: "Growth" },
-  { key: "accounts", label: "Accounts" },
-  { key: null, label: "Settings", soon: true },
+  { key: null, label: "Tax Center", soon: true },
+  { key: "profile", label: "Profile" },
 ]
 
 // Dividnd brand mark — navy on transparent.
@@ -97,59 +96,18 @@ function Sidebar({
         >
           Reset demo
         </button>
+        <p className="text-[12px] leading-relaxed" style={{ color: muted }}>
+          Not financial advice. For informational purposes only. Dividnd surfaces strategies — you
+          make the decisions.
+        </p>
       </div>
     </aside>
-  )
-}
-
-// ── Mobile tab bar (sidebar is hidden on mobile) ─────────────────────────────
-function MobileTabs({ tab, onTab }: { tab: Tab; onTab: (t: Tab) => void }) {
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "plan", label: "My Plan" },
-    { key: "portfolio", label: "Growth" },
-    { key: "accounts", label: "Accounts" },
-  ]
-  return (
-    <div className="flex gap-2 border-b px-6 py-3 md:hidden" style={{ borderColor: border }}>
-      {tabs.map((t) => (
-        <button
-          key={t.key}
-          type="button"
-          onClick={() => onTab(t.key)}
-          className="btn-hover px-3 py-1.5 text-sm font-medium"
-          style={{
-            borderRadius: 999,
-            backgroundColor: tab === t.key ? navy : "transparent",
-            color: tab === t.key ? cream : navy,
-          }}
-        >
-          {t.label}
-        </button>
-      ))}
-    </div>
   )
 }
 
 // ── App shell ─────────────────────────────────────────────────────────────────
 export function Dashboard({ onReset }: { onReset: () => void }) {
   const [tab, setTab] = useState<Tab>("plan")
-  const [applied, setApplied] = useState<string[]>(() => loadEvents())
-
-  const state = deriveState(applied)
-
-  function apply(id: string) {
-    if (applied.includes(id)) return
-    const next = [...applied, id]
-    setApplied(next)
-    saveEvents(next)
-  }
-
-  // Undo an applied event — situation re-derives cleanly from base.
-  function unapply(id: string) {
-    const next = applied.filter((x) => x !== id)
-    setApplied(next)
-    saveEvents(next)
-  }
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: cream }}>
@@ -166,16 +124,15 @@ export function Dashboard({ onReset }: { onReset: () => void }) {
             ↺ Restart demo
           </button>
         </div>
-        <MobileTabs tab={tab} onTab={setTab} />
         <main key={tab} className="fade-in flex flex-1 flex-col px-6 pb-10 pt-6 sm:px-10">
-          {tab === "plan" && <PlanTab state={state} onApply={apply} onUndo={unapply} />}
-          {tab === "accounts" && <AccountsTab state={state} />}
+          {tab === "plan" && <PlanTab />}
+          {tab === "profile" && <ProfileTab />}
           {tab === "portfolio" && <PortfolioTab />}
         </main>
       </div>
 
       {/* Floating assistant — available on every tab */}
-      <ChatWidget applied={applied} onApply={apply} />
+      <ChatWidget />
     </div>
   )
 }

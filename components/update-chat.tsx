@@ -2,24 +2,66 @@
 
 import { useEffect, useRef, useState } from "react"
 import { COLORS } from "@/lib/dividnd"
-import { EVENTS, getEvent, routeMessage } from "@/lib/demo-state"
 
 const { navy, cream, ink, white, border } = COLORS
 
 type Msg = { role: "user" | "bot"; text: string }
 
 const GREETING =
-  "Hi Jordan — ask me anything about your money, or tell me something we can't see automatically (like an account you opened elsewhere). I'll keep your plan in sync."
+  "I'm your Dividnd wealth strategist. Ask me anything about your plan — your 401(k) match, Roth IRA, the mega backdoor Roth, I-Bonds, your HSA, or whether to pay loans or invest."
 
-export function UpdateChat({
-  applied,
-  onApply,
-  bare = false,
-}: {
-  applied: string[]
-  onApply: (id: string) => void
-  bare?: boolean // drop the outer border/margin when hosted inside another panel
-}) {
+// ── Static strategy Q&A — keyword-matched canned answers. No state mutation. ──
+type Topic = { keywords: string[]; answer: string }
+
+const TOPICS: Topic[] = [
+  {
+    keywords: ["match", "401k", "401(k)", "employer"],
+    answer:
+      "Your employer matches 4% of salary — $3,800/year on $95,000. That's a guaranteed 100% return, so it's always move #1. Contribute at least 4% to capture all of it before anything else.",
+  },
+  {
+    keywords: ["backdoor", "mega"],
+    answer:
+      "The mega backdoor Roth: the employee 401(k) limit is $23,500, but the total limit including employer is $70,000. If your plan allows after-tax contributions and in-plan Roth conversions, you can fill that ~$46,500 gap and convert it to Roth tax-free. Ask HR: 'Does my plan allow after-tax contributions and in-plan Roth conversions?'",
+  },
+  {
+    keywords: ["roth", "ira", "fidelity"],
+    answer:
+      "At 22 and $95,000 you're under the Roth income limit. Contribute $7,000 this year into a Roth IRA and invest in FZROX. At 8%, that single $7,000 becomes ~$106,000 tax-free by 65 — and every year you wait costs you roughly $8,000 in future tax-free wealth.",
+  },
+  {
+    keywords: ["i-bond", "ibond", "i bond", "emergency", "treasury", "savings"],
+    answer:
+      "Keep one month of expenses in a HYSA for liquidity, then put the rest of your emergency fund in I-Bonds — US Treasury bonds that pay the inflation rate (~4.3%) with zero default risk. The catch: no withdrawals in the first 12 months. On a $23,750 fund that's ~$950/year more than a checking account, risk-free.",
+  },
+  {
+    keywords: ["hsa", "health", "medical"],
+    answer:
+      "If you're on an HDHP, the HSA is the only triple-tax-free account in the code: pre-tax in, tax-free growth, tax-free medical withdrawals. Contribute $4,300, invest it, pay medical costs out of pocket, and save every receipt — you can reimburse yourself tax-free decades later.",
+  },
+  {
+    keywords: ["loan", "loans", "debt", "pay off", "invest", "refinance"],
+    answer:
+      "Your loans are at 5.5% — above the risk-free return you can earn elsewhere, so after capturing your match and funding your Roth IRA, attack them. Paying $500 extra/month clears your $27,000 balance 3 years faster and saves $4,200 in interest. Check a refinance rate too.",
+  },
+]
+
+function answerFor(text: string): string {
+  const t = text.toLowerCase()
+  for (const topic of TOPICS) {
+    if (topic.keywords.some((k) => t.includes(k))) return topic.answer
+  }
+  return "I can walk you through any move in your wealth plan — try asking about your 401(k) match, Roth IRA, the mega backdoor Roth, I-Bonds, your HSA, or paying off loans vs investing."
+}
+
+const SUGGESTIONS = [
+  "What's a mega backdoor Roth?",
+  "Should I pay loans or invest?",
+  "Why I-Bonds?",
+  "Why open a Roth IRA?",
+]
+
+export function UpdateChat({ bare = false }: { bare?: boolean }) {
   const [messages, setMessages] = useState<Msg[]>([{ role: "bot", text: GREETING }])
   const [input, setInput] = useState("")
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -30,18 +72,8 @@ export function UpdateChat({
     if (el) el.scrollTop = el.scrollHeight
   }, [messages])
 
-  function respond(userText: string, forcedId?: string) {
-    const id = forcedId ?? routeMessage(userText)
-    let botText: string
-    if (!id) {
-      botText =
-        "I didn't quite catch that. Mention your paycheck, savings, 401(k), Roth IRA, or loans — or tap a suggestion below."
-    } else if (applied.includes(id)) {
-      botText = "You've already logged that one — it's reflected in your plan. ✓"
-    } else {
-      onApply(id)
-      botText = `${getEvent(id)!.confirm}  ✓ I've updated your plan.`
-    }
+  function respond(userText: string) {
+    const botText = answerFor(userText)
     setMessages((m) => [...m, { role: "user", text: userText }, { role: "bot", text: botText }])
   }
 
@@ -51,8 +83,6 @@ export function UpdateChat({
     setInput("")
     respond(t)
   }
-
-  const suggestions = EVENTS.filter((e) => e.chip && !applied.includes(e.id))
 
   return (
     <div
@@ -78,22 +108,20 @@ export function UpdateChat({
         ))}
       </div>
 
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-2 px-5 pb-3">
-          {suggestions.map((e) => (
-            <button
-              key={e.id}
-              type="button"
-              onClick={() => respond(e.chip!, e.id)}
-              className="btn-hover border px-3 py-1.5 text-xs font-medium"
-              style={{ borderRadius: 999, backgroundColor: cream, borderColor: border, color: navy }}
-            >
-              {e.chip}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Example questions */}
+      <div className="flex flex-wrap gap-2 px-5 pb-3">
+        {SUGGESTIONS.map((q) => (
+          <button
+            key={q}
+            type="button"
+            onClick={() => respond(q)}
+            className="btn-hover border px-3 py-1.5 text-xs font-medium"
+            style={{ borderRadius: 999, backgroundColor: cream, borderColor: border, color: navy }}
+          >
+            {q}
+          </button>
+        ))}
+      </div>
 
       {/* Input */}
       <div className="flex items-center gap-2 border-t p-3" style={{ borderColor: border }}>
@@ -104,7 +132,7 @@ export function UpdateChat({
           onKeyDown={(e) => {
             if (e.key === "Enter") handleSend()
           }}
-          placeholder="Tell Dividnd what changed…"
+          placeholder="Ask about your wealth plan…"
           className="flex-1 border px-4 py-2.5 text-sm outline-none"
           style={{ borderRadius: 4, borderColor: border, backgroundColor: white, color: ink }}
         />

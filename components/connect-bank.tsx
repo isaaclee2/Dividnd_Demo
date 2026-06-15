@@ -29,12 +29,12 @@ export function ConnectBank({ onConnected }: { onConnected: () => void }) {
         </span>
 
         <h1 className="mt-4 font-heading text-3xl sm:text-4xl" style={{ color: ink }}>
-          Connect your bank to let Dividnd monitor your finances automatically
+          Connect your accounts so Dividnd can tailor your wealth plan to your real numbers
         </h1>
 
         <p className="mt-4 text-base" style={{ color: navy, opacity: 0.8 }}>
-          Dividnd watches your accounts in the background and surfaces money moves
-          before you ever have to ask. Bank-grade encryption. Read-only access.
+          Your income, balances, and loans shape every strategy in your wealth plan.
+          Bank-grade encryption. Read-only access — Dividnd never moves your money.
         </p>
 
         <button

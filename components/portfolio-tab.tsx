@@ -111,8 +111,10 @@ function Chart() {
       {/* strategy line (solid navy) */}
       <polyline points={pts(strategy)} fill="none" style={{ stroke: navy }} strokeWidth={2.5} />
 
-      {/* "THE GAP" annotation pointing to the space between the lines */}
-      <line x1={gapX} y1={gapTop} x2={gapX} y2={gapBot} style={{ stroke: muted }} strokeWidth={1} strokeDasharray="2 3" opacity={0.6} />
+      {/* "THE GAP" — double-headed arrow spanning the space between the lines */}
+      <line x1={gapX} y1={gapTop} x2={gapX} y2={gapBot} style={{ stroke: muted }} strokeWidth={1} opacity={0.7} />
+      <polyline points={`${gapX - 3},${gapTop + 5} ${gapX},${gapTop} ${gapX + 3},${gapTop + 5}`} fill="none" style={{ stroke: muted }} strokeWidth={1} opacity={0.7} />
+      <polyline points={`${gapX - 3},${gapBot - 5} ${gapX},${gapBot} ${gapX + 3},${gapBot - 5}`} fill="none" style={{ stroke: muted }} strokeWidth={1} opacity={0.7} />
       <text x={gapX + 8} y={gapMid} style={{ fill: muted, letterSpacing: "0.12em" }} fontSize={10} fontWeight={700}>
         THE GAP
       </text>
@@ -172,19 +174,23 @@ function LegendDot({ color, dashed }: { color: string; dashed?: boolean }) {
   )
 }
 
-// ── "What drives the gap" explainer cards ────────────────────────────────────
-const DRIVERS: { label: string; body: string }[] = [
+// ── "What drives this gap" explainer cards ───────────────────────────────────
+const DRIVERS: { label: string; stat: string; body: string; glyph?: string }[] = [
   {
-    label: "Tax optimization",
-    body: "Roth IRA, backdoor Roth, and HSA together save an estimated $340,000 in lifetime taxes",
+    label: "Tax Optimization",
+    stat: "~$340,000",
+    glyph: "%",
+    body: "Roth IRA, backdoor Roth, and HSA together eliminate an estimated $340,000 in lifetime tax liability.",
   },
   {
-    label: "Compound growth",
-    body: "7% invested vs 0.5% in savings — the difference compounds to $800,000 over 40 years",
+    label: "Compound Growth",
+    stat: "~$800,000",
+    body: "7% invested vs 0.5% in savings. The difference compounds to $800,000 over 40 years.",
   },
   {
-    label: "Starting early",
-    body: "Every year you wait costs roughly $50,000 at retirement. You're 22. Now is the time.",
+    label: "Starting at 22",
+    stat: "~$8,000/year",
+    body: "Every year you delay following this plan costs approximately $8,000 at retirement. Time is the variable you can't buy back.",
   },
 ]
 
@@ -197,11 +203,28 @@ export function PortfolioTab() {
   return (
     <div className="mx-auto w-full max-w-5xl">
       <h1 className="font-heading text-4xl" style={{ color: ink }}>
-        Growth
+        Your Wealth Trajectory
       </h1>
-      <p className="mt-2 text-base" style={{ color: navy }}>
-        The cost of doing nothing — your money invested vs. left in savings.
+      <p className="mt-2 text-base" style={{ color: muted }}>
+        What following your plan is worth over 40 years — same income, same savings rate, different
+        decisions.
       </p>
+
+      {/* The gap callout — full width navy band, sharp corners, above the chart */}
+      <section
+        className="mt-8 p-8 text-center"
+        style={{ borderRadius: 0, backgroundColor: navy, color: cream }}
+      >
+        <p className="font-heading text-4xl font-bold sm:text-5xl" style={{ color: cream }}>
+          $1,477,000
+        </p>
+        <p className="mx-auto mt-3 max-w-2xl text-base" style={{ color: cream, opacity: 0.9 }}>
+          The gap between following your wealth plan and doing nothing.
+        </p>
+        <p className="mt-2 text-xs" style={{ color: cream, opacity: 0.65 }}>
+          Same salary. Same savings rate. The difference is strategy.
+        </p>
+      </section>
 
       {/* Chart */}
       <section className="card-hover mt-8 border p-6" style={{ borderRadius: 4, backgroundColor: white, borderColor: border }}>
@@ -220,31 +243,13 @@ export function PortfolioTab() {
         <Chart />
       </section>
 
-      {/* The gap callout — full width, navy band */}
-      <section
-        className="mt-6 p-8 text-center"
-        style={{ borderRadius: 4, backgroundColor: navy, color: cream }}
-      >
-        <p className="font-heading text-4xl font-bold sm:text-5xl" style={{ color: cream }}>
-          $1,477,000
-        </p>
-        <p className="mx-auto mt-3 max-w-2xl text-base" style={{ color: cream, opacity: 0.9 }}>
-          The gap. This is what smart financial decisions are worth over 40 years.
-        </p>
-        <p className="mt-2 text-xs" style={{ color: cream, opacity: 0.65 }}>
-          Same income. Same savings rate. Different choices.
-        </p>
-      </section>
-
       {/* Outcome cards */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div
           className="card-hover border p-6"
           style={{ borderRadius: 4, backgroundColor: white, borderColor: border, borderLeft: `3px solid ${navy}` }}
         >
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: navy }}>
-            With Dividnd
-          </p>
+          <p className="section-label">With Dividnd</p>
           <p className="mt-2 font-heading font-bold" style={{ color: navy, fontSize: 32 }}>
             ~{formatMoney(round(endStrategy))}
           </p>
@@ -253,7 +258,7 @@ export function PortfolioTab() {
           </p>
         </div>
         <div className="card-hover border p-6" style={{ borderRadius: 4, backgroundColor: white, borderColor: border }}>
-          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: STATUS_TEXT }}>
+          <p className="section-label" style={{ color: STATUS_TEXT }}>
             Status quo
           </p>
           <p className="mt-2 font-heading font-bold" style={{ color: STATUS_TEXT, fontSize: 32 }}>
@@ -265,13 +270,8 @@ export function PortfolioTab() {
         </div>
       </div>
 
-      {/* What drives the gap */}
-      <h2
-        className="mt-10 text-sm font-semibold uppercase"
-        style={{ color: navy, letterSpacing: "0.15em" }}
-      >
-        What drives the gap
-      </h2>
+      {/* What drives this gap */}
+      <h2 className="section-label mt-10">What drives this gap</h2>
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         {DRIVERS.map((d) => (
           <div
@@ -279,10 +279,21 @@ export function PortfolioTab() {
             className="card-hover border p-5"
             style={{ borderRadius: 4, backgroundColor: white, borderColor: border }}
           >
-            <p className="text-xs font-semibold uppercase" style={{ color: navy, letterSpacing: "0.1em" }}>
-              {d.label}
+            <div className="flex items-center gap-2">
+              {d.glyph && (
+                <span
+                  className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm font-bold"
+                  style={{ backgroundColor: "var(--c-tint)", color: navy }}
+                >
+                  {d.glyph}
+                </span>
+              )}
+              <p className="section-label">{d.label}</p>
+            </div>
+            <p className="mt-2 font-heading font-bold" style={{ color: navy, fontSize: 28 }}>
+              {d.stat}
             </p>
-            <p className="mt-2 text-sm leading-relaxed" style={{ color: ink }}>
+            <p className="mt-1 text-sm leading-relaxed" style={{ color: ink }}>
               {d.body}
             </p>
           </div>
