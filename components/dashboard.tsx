@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { COLORS } from "@/lib/dividnd"
-import { PlanTab } from "@/components/plan-tab"
-import { ProfileTab } from "@/components/profile-tab"
-import { PortfolioTab } from "@/components/portfolio-tab"
-import { ChatWidget } from "@/components/chat-widget"
+import { useState } from "react";
+import { COLORS } from "@/lib/dividnd";
+import { PlanTab } from "@/components/plan-tab";
+import { ProfileTab } from "@/components/profile-tab";
+import { PortfolioTab } from "@/components/portfolio-tab";
+import { ChatWidget } from "@/components/chat-widget";
 
-const { navy, cream, ink, white, sidebar, border, muted } = COLORS
+const { navy, cream, ink, white, sidebar, border, muted } = COLORS;
 
-type Tab = "plan" | "portfolio" | "profile"
+type Tab = "plan" | "portfolio" | "profile";
 
 const NAV_ITEMS: { key: Tab | null; label: string; soon?: boolean }[] = [
   { key: "plan", label: "My Plan" },
   { key: "portfolio", label: "Growth" },
   { key: null, label: "Tax Center", soon: true },
   { key: "profile", label: "Profile" },
-]
+];
 
 // Dividnd brand mark — navy on transparent.
 function LogoMark({ size = 36 }: { size?: number }) {
@@ -26,9 +26,14 @@ function LogoMark({ size = 36 }: { size?: number }) {
       alt="Dividnd"
       width={size}
       height={size}
-      style={{ display: "block", height: size, width: size, objectFit: "contain" }}
+      style={{
+        display: "block",
+        height: size,
+        width: size,
+        objectFit: "contain",
+      }}
     />
-  )
+  );
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -37,9 +42,9 @@ function Sidebar({
   onTab,
   onReset,
 }: {
-  tab: Tab
-  onTab: (t: Tab) => void
-  onReset: () => void
+  tab: Tab;
+  onTab: (t: Tab) => void;
+  onReset: () => void;
 }) {
   return (
     <aside
@@ -48,14 +53,17 @@ function Sidebar({
     >
       <div>
         <div className="flex items-center gap-1.5">
-          <LogoMark size={36} />
-          <div className="font-heading text-2xl font-bold" style={{ color: navy }}>
+          <LogoMark size={44} />
+          <div
+            className="font-heading text-2xl font-bold"
+            style={{ color: navy }}
+          >
             Dividnd
           </div>
         </div>
         <nav className="mt-10 flex flex-col gap-1">
           {NAV_ITEMS.map((item) => {
-            const active = item.key !== null && item.key === tab
+            const active = item.key !== null && item.key === tab;
             return (
               <button
                 key={item.label}
@@ -80,7 +88,7 @@ function Sidebar({
                   </span>
                 )}
               </button>
-            )
+            );
           })}
         </nav>
       </div>
@@ -97,17 +105,17 @@ function Sidebar({
           Reset demo
         </button>
         <p className="text-[12px] leading-relaxed" style={{ color: muted }}>
-          Not financial advice. For informational purposes only. Dividnd surfaces strategies — you
-          make the decisions.
+          Not financial advice. For informational purposes only. Dividnd
+          surfaces strategies — you make the decisions.
         </p>
       </div>
     </aside>
-  )
+  );
 }
 
 // ── App shell ─────────────────────────────────────────────────────────────────
 export function Dashboard({ onReset }: { onReset: () => void }) {
-  const [tab, setTab] = useState<Tab>("plan")
+  const [tab, setTab] = useState<Tab>("plan");
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: cream }}>
@@ -119,12 +127,20 @@ export function Dashboard({ onReset }: { onReset: () => void }) {
             type="button"
             onClick={onReset}
             className="btn-hover border px-3.5 py-1.5 text-xs font-semibold"
-            style={{ borderRadius: 999, borderColor: border, backgroundColor: white, color: navy }}
+            style={{
+              borderRadius: 999,
+              borderColor: border,
+              backgroundColor: white,
+              color: navy,
+            }}
           >
             ↺ Restart demo
           </button>
         </div>
-        <main key={tab} className="fade-in flex flex-1 flex-col px-6 pb-10 pt-6 sm:px-10">
+        <main
+          key={tab}
+          className="fade-in flex flex-1 flex-col px-6 pb-10 pt-6 sm:px-10"
+        >
           {tab === "plan" && <PlanTab />}
           {tab === "profile" && <ProfileTab />}
           {tab === "portfolio" && <PortfolioTab />}
@@ -134,5 +150,5 @@ export function Dashboard({ onReset }: { onReset: () => void }) {
       {/* Floating assistant — available on every tab */}
       <ChatWidget />
     </div>
-  )
+  );
 }
