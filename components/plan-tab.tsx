@@ -6,10 +6,6 @@ import { GOAL } from "@/lib/demo-state"
 
 const { navy, cream, ink, white, gold, border, muted } = COLORS
 
-// Hardcoded wealth score for the demo (static — not derived).
-const SCORE = 28
-const SCORE_FULL = 94
-
 // ── The six private-wealth strategies (hardcoded, static). ───────────────────
 type StrategyCard = {
   id: string
@@ -109,10 +105,14 @@ function PlanCard({
   card,
   open,
   onToggle,
+  done,
+  onToggleDone,
 }: {
   card: StrategyCard
   open: boolean
   onToggle: () => void
+  done: boolean
+  onToggleDone: () => void
 }) {
   const topPriority = card.priority === 1
 
@@ -123,16 +123,16 @@ function PlanCard({
         borderRadius: 4,
         borderColor: border,
         backgroundColor: white,
-        borderLeft: topPriority ? `3px solid ${navy}` : undefined,
+        borderLeft: done ? `3px solid ${gold}` : topPriority ? `3px solid ${navy}` : undefined,
       }}
     >
       {/* Priority badge + platform badge */}
       <div className="flex items-center justify-between">
         <span
           className="flex h-7 w-7 flex-none items-center justify-center rounded-full text-sm font-bold"
-          style={{ backgroundColor: navy, color: white }}
+          style={{ backgroundColor: done ? gold : navy, color: white }}
         >
-          {card.priority}
+          {done ? "✓" : card.priority}
         </span>
         <span className="platform-badge">{card.badge}</span>
       </div>
@@ -169,6 +169,21 @@ function PlanCard({
           {open ? "Hide" : "Why this?"}
         </button>
       </div>
+
+      <button
+        type="button"
+        onClick={onToggleDone}
+        aria-pressed={done}
+        className="btn-hover border px-5 py-2 text-center text-sm font-semibold"
+        style={{
+          borderRadius: 4,
+          backgroundColor: done ? gold : white,
+          borderColor: done ? gold : border,
+          color: done ? white : muted,
+        }}
+      >
+        {done ? "Done ✓" : "Mark done"}
+      </button>
 
       {/* Inline expandable explanation — animated max-height, no modal */}
       <div
@@ -208,7 +223,21 @@ function EditIcon() {
 export function PlanTab() {
   // Only one "Why this?" open at a time.
   const [openId, setOpenId] = useState<string | null>(null)
-  const pct = Math.round((SCORE / 100) * 100)
+  // Which strategies the user has marked complete.
+  const [done, setDone] = useState<Set<string>>(new Set())
+
+  const toggleDone = (id: string) =>
+    setDone((cur) => {
+      const next = new Set(cur)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const total = CARDS.length
+  const doneCount = done.size
+  const pct = Math.round((doneCount / total) * 100)
+  const allDone = doneCount === total
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -251,17 +280,14 @@ export function PlanTab() {
         </span>
       </div>
 
-      {/* Wealth score */}
+      {/* Plan progress */}
       <section
         className="card-hover mt-8 border p-6"
         style={{ borderRadius: 4, backgroundColor: white, borderColor: border }}
       >
-        <p className="section-label">Wealth Score</p>
+        <p className="section-label">Plan progress</p>
         <p className="mt-2 font-heading font-bold" style={{ color: navy, fontSize: 48, lineHeight: 1 }}>
-          {SCORE} / 100
-        </p>
-        <p className="mt-2 text-sm" style={{ color: muted }}>
-          Complete your action plan to increase your score
+          {doneCount} of {total} steps complete
         </p>
         <div
           className="mt-4 h-2 w-full"
@@ -272,13 +298,10 @@ export function PlanTab() {
             style={{ width: `${pct}%`, backgroundColor: navy, borderRadius: 4 }}
           />
         </div>
-        <p className="mt-3 text-sm" style={{ color: ink }}>
-          Following this plan fully puts you at{" "}
-          <span style={{ color: navy, fontWeight: 700 }}>{SCORE_FULL} / 100</span>.
-        </p>
-        <p className="mt-2 text-xs" style={{ color: muted }}>
-          Score reflects tax optimization, account structure, and investment strategy — not spending
-          habits.
+        <p className="mt-3 text-sm" style={{ color: muted }}>
+          {allDone
+            ? "Every move complete — nice work."
+            : "Mark each move done as you complete it."}
         </p>
       </section>
 
@@ -295,6 +318,8 @@ export function PlanTab() {
             card={card}
             open={openId === card.id}
             onToggle={() => setOpenId((cur) => (cur === card.id ? null : card.id))}
+            done={done.has(card.id)}
+            onToggleDone={() => toggleDone(card.id)}
           />
         ))}
       </div>

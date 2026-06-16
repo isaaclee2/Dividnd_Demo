@@ -20,13 +20,8 @@ export const COLORS = {
   red: "var(--c-red)",
 } as const
 
-// ── Demo user + wealth score ────────────────────────────────────────────────
+// ── Demo user ────────────────────────────────────────────────────────────────
 export const DEMO_USER = { name: "Jordan" } as const
-
-// Base 20 + (match / Roth IRA / emergency fund / no high-interest debt) at 20 each.
-// Hardcoded to 40/100 for the demo user.
-export const WEALTH_SCORE = 40
-export const WEALTH_SCORE_MAX = 100
 
 // ── Onboarding option sets ──────────────────────────────────────────────────
 export const EMPLOYMENT_OPTIONS = [
@@ -90,16 +85,6 @@ export function toApiInput(a: OnboardingAnswers) {
     jobOffer: a.jobOffer,
     parentsComfortable: a.parentsComfortable,
   }
-}
-
-// ── Per-card score contribution (shown on each action card) ──────────────────
-export function pointsForCard(card: ActionCard): number {
-  const t = `${card.title} ${card.why}`.toLowerCase()
-  if (/(401|employer match)/.test(t)) return 20
-  if (/(roth|ira|backdoor)/.test(t)) return 20
-  if (/(emergency|cushion|savings|safety net)/.test(t)) return 20
-  if (/(debt|loan|high.interest)/.test(t)) return 20
-  return 10
 }
 
 // ── localStorage persistence (guarded for SSR) ───────────────────────────────
